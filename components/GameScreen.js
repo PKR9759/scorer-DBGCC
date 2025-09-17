@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { RotateCcw, Trophy } from 'lucide-react';
+import { RotateCcw, Trophy, Undo2 } from 'lucide-react'; // Import the Undo2 icon
 import { useCricket } from '../hooks/useCricket';
 import BatsmanBowlerSetup from './BatsmanBowlerSetup';
 import ScoreDisplay from './ScoreDisplay';
@@ -19,6 +19,10 @@ const GameScreen = () => {
     dispatch({ type: 'RESET_MATCH' });
   };
 
+  const handleUndo = () => {
+    dispatch({ type: 'UNDO' });
+  };
+
   // Check if we need batsman/bowler setup
   if (!currentInnings.currentBatsman || !currentInnings.currentBowler) {
     return <BatsmanBowlerSetup />;
@@ -33,14 +37,22 @@ const GameScreen = () => {
             <h1 className="text-xl font-bold text-gray-900">
               {state.currentInnings === 1 ? 'First' : 'Second'} Innings
             </h1>
-            <button
-              onClick={handleReset}
-              className="p-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
-            >
-              <RotateCcw className="w-5 h-5" />
-            </button>
+            <div className="flex space-x-2">
+              <button
+                onClick={handleUndo}
+                disabled={state.history.length === 0}
+                className="p-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Undo2 className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleReset}
+                className="p-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+              >
+                <RotateCcw className="w-5 h-5" />
+              </button>
+            </div>
           </div>
-
           <ScoreDisplay />
           <NewBatsmanInput />
         </div>
@@ -57,14 +69,22 @@ const GameScreen = () => {
             <h1 className="text-xl font-bold text-gray-900">
               {state.currentInnings === 1 ? 'First' : 'Second'} Innings
             </h1>
-            <button
-              onClick={handleReset}
-              className="p-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
-            >
-              <RotateCcw className="w-5 h-5" />
-            </button>
+            <div className="flex space-x-2">
+              <button
+                onClick={handleUndo}
+                disabled={state.history.length === 0}
+                className="p-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Undo2 className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleReset}
+                className="p-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+              >
+                <RotateCcw className="w-5 h-5" />
+              </button>
+            </div>
           </div>
-
           <ScoreDisplay />
           <NewBowlerInput />
         </div>
@@ -131,12 +151,21 @@ const GameScreen = () => {
           <h1 className="text-xl font-bold text-gray-900">
             {state.currentInnings === 1 ? 'First' : 'Second'} Innings
           </h1>
-          <button
-            onClick={handleReset}
-            className="p-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
-          >
-            <RotateCcw className="w-5 h-5" />
-          </button>
+          <div className="flex space-x-2">
+  <button
+    onClick={handleUndo}
+    disabled={state.history.length === 0}
+    className="p-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+  >
+    <Undo2 className="w-5 h-5" />
+  </button>
+  <button
+    onClick={handleReset}
+    className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors shadow-sm"
+  >
+    <RotateCcw className="w-5 h-5" />
+  </button>
+</div>
         </div>
 
         <ScoreDisplay />

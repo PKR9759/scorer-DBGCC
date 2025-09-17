@@ -3,6 +3,9 @@
 import React from 'react';
 import { useCricket } from '../hooks/useCricket';
 
+
+// ... existing code ...
+
 const Commentary = () => {
   const { state } = useCricket();
   const currentInnings = state.currentInnings === 1 ? state.innings1 : state.innings2;
@@ -18,7 +21,8 @@ const Commentary = () => {
           <div
             key={index}
             className={`p-2 rounded-lg text-sm ${
-              index === 0 ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50'
+             
+                 'bg-gray-50 text-gray-700'
             }`}
           >
             {comment}
