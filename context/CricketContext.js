@@ -55,7 +55,7 @@ export const cricketReducer = (state, action) => {
     case 'SETUP_MATCH': {
       const { teamA, teamB, battingFirst, totalOvers, playersTeamA, playersTeamB, venue } = action.payload;
       const bowlingFirst = battingFirst === teamA ? teamB : teamA;
-
+      
       return {
         ...state,
         matchSetup: { teamA, teamB, venue, totalOvers, playersTeamA, playersTeamB },
@@ -74,9 +74,8 @@ export const cricketReducer = (state, action) => {
         history: [], // Ensure history is empty at the start of a new match
       };
     }
-
+    
     case 'SET_BATSMAN_BOWLER': {
-      // Snapshot the state before the change
       const historySnapshot = [...state.history, state];
       const currentInningsKey = state.currentInnings === 1 ? 'innings1' : 'innings2';
       return {
@@ -86,14 +85,14 @@ export const cricketReducer = (state, action) => {
           currentBatsman: action.payload.batsman,
           currentBowler: action.payload.bowler
         },
-        history: historySnapshot, // Save the snapshot
+        history: historySnapshot,
       };
     }
-
+    
     case 'ADD_DELIVERY': {
       // Snapshot the state before the change
       const historySnapshot = [...state.history, state];
-  
+
       const currentInnings = state.currentInnings === 1 ? 'innings1' : 'innings2';
       const currentInningsData = state[currentInnings];
       
@@ -134,14 +133,19 @@ export const cricketReducer = (state, action) => {
           commentaryText = `${runs} run${runs !== 1 ? 's' : ''}`;
         }
       }
-  
-      // THIS IS THE KEY FIX: Calculate ballNumber AFTER the score updates, but BEFORE the over completion logic
-      // This ensures the correct ball number (e.g., 4.6) is used before it's reset to 5.0
+
       const ballNumber = `${newScore.overs}.${newScore.balls === 0 && !isExtra ? 6 : newScore.balls}`;
       let fullCommentaryText = `${ballNumber}: ${currentInningsData.currentBatsman} - ` + commentaryText;
-  
-      // Update current over and history
-      newCurrentOver.push({ type, runs, isWicket, isExtra, batsman: currentInningsData.currentBatsman });
+
+      newCurrentOver.push({ 
+          type, 
+          runs, 
+          isWicket, 
+          isExtra, 
+          batsman: currentInningsData.currentBatsman,
+          bowler: currentInningsData.currentBowler, 
+          dismissalBowler: isWicket ? currentInningsData.currentBowler : null
+      });
       
       // Check for over completion (only for legal deliveries)
       if (!isExtra && newScore.balls === 6) {
@@ -175,7 +179,7 @@ export const cricketReducer = (state, action) => {
       
       // Prepend commentary text
       newCommentary.unshift(fullCommentaryText);
-
+      
       // Check innings completion conditions
       if (isInningsComplete) {
         if (state.currentInnings === 1) {
@@ -198,13 +202,13 @@ export const cricketReducer = (state, action) => {
             currentInnings: 2,
             gameState: newGameState,
             secondaryInput: null,
-            history: historySnapshot // Save the snapshot
+            history: historySnapshot
           };
         } else {
           newGameState = 'finished';
           const team1Score = state.innings1.score.runs;
           const team2Score = newScore.runs;
-
+          
           if (team2Score > team1Score) {
             const team2Players = state.matchSetup.playersTeamB;
             newWinner = {
@@ -223,7 +227,7 @@ export const cricketReducer = (state, action) => {
           }
         }
       }
-
+      
       return {
         ...state,
         [currentInnings]: {
@@ -239,19 +243,18 @@ export const cricketReducer = (state, action) => {
         winner: newWinner,
         needsNewBatsman: state.needsNewBatsman,
         needsNewBowler: state.needsNewBowler,
-        history: historySnapshot, // Save the snapshot
+        history: historySnapshot,
       };
     }
-
+    
     case 'SET_SECONDARY_INPUT':
       return {
         ...state,
         secondaryInput: action.payload
       };
-
+    
     case 'SET_NEW_BATSMAN': {
-      // Snapshot the state before the change
-      const historySnapshot = [...state.history, state];
+      // Fix: Do NOT save to history here.
       const currentInningsForBatsman = state.currentInnings === 1 ? 'innings1' : 'innings2';
       return {
         ...state,
@@ -260,13 +263,11 @@ export const cricketReducer = (state, action) => {
           currentBatsman: action.payload
         },
         needsNewBatsman: false,
-        history: historySnapshot, // Save the snapshot
       };
     }
-
+    
     case 'SET_NEW_BOWLER': {
-      // Snapshot the state before the change
-      const historySnapshot = [...state.history, state];
+      // Fix: Do NOT save to history here.
       const currentInningsForBowler = state.currentInnings === 1 ? 'innings1' : 'innings2';
       return {
         ...state,
@@ -275,30 +276,39 @@ export const cricketReducer = (state, action) => {
           currentBowler: action.payload
         },
         needsNewBowler: false,
-        history: historySnapshot, // Save the snapshot
       };
     }
-
+    
     case 'UNDO':
       if (state.history.length > 0) {
         const previousState = state.history[state.history.length - 1];
         const newHistory = state.history.slice(0, -1);
-
-        // Return the previous state but specifically clear the flags
-        // that trigger secondary input screens to prevent re-displaying them.
+        
         return {
           ...previousState,
-          secondaryInput: null, // Clear the secondary input flag
-          needsNewBatsman: false, // Clear the new batsman flag
-          needsNewBowler: false, // Clear the new bowler flag
+          secondaryInput: null,
+          needsNewBatsman: false,
+          needsNewBowler: false,
           history: newHistory,
         };
       }
       return state;
-
+    
     case 'RESET_MATCH':
       return initialState;
 
+    case 'VIEW_SCORECARD':
+        return {
+            ...state,
+            gameState: 'scorecard'
+        };
+
+    case 'GO_BACK_TO_GAME':
+        return {
+            ...state,
+            gameState: state.currentInnings === 1 ? 'innings1' : 'innings2'
+        };
+    
     default:
       return state;
   }
@@ -307,7 +317,7 @@ export const cricketReducer = (state, action) => {
 // Cricket Provider Component
 export const CricketProvider = ({ children }) => {
   const [state, dispatch] = useReducer(cricketReducer, initialState);
-
+  
   return (
     <CricketContext.Provider value={{ state, dispatch }}>
       {children}
