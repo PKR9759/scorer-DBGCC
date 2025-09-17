@@ -90,9 +90,7 @@ export const cricketReducer = (state, action) => {
     }
     
     case 'ADD_DELIVERY': {
-      // Snapshot the state before the change
       const historySnapshot = [...state.history, state];
-
       const currentInnings = state.currentInnings === 1 ? 'innings1' : 'innings2';
       const currentInningsData = state[currentInnings];
       
@@ -107,10 +105,6 @@ export const cricketReducer = (state, action) => {
       let newWinner = state.winner;
       
       const battingTeamPlayers = state.currentInnings === 1 ? state.matchSetup.playersTeamA : state.matchSetup.playersTeamB;
-      const isInningsComplete = 
-        newScore.wickets >= battingTeamPlayers || 
-        newScore.overs >= state.matchSetup.totalOvers || 
-        (state.currentInnings === 2 && newScore.runs > state.innings1.score.runs); 
       
       let commentaryText = '';
       
@@ -133,10 +127,10 @@ export const cricketReducer = (state, action) => {
           commentaryText = `${runs} run${runs !== 1 ? 's' : ''}`;
         }
       }
-
+  
       const ballNumber = `${newScore.overs}.${newScore.balls === 0 && !isExtra ? 6 : newScore.balls}`;
       let fullCommentaryText = `${ballNumber}: ${currentInningsData.currentBatsman} - ` + commentaryText;
-
+  
       newCurrentOver.push({ 
           type, 
           runs, 
@@ -180,7 +174,12 @@ export const cricketReducer = (state, action) => {
       // Prepend commentary text
       newCommentary.unshift(fullCommentaryText);
       
-      // Check innings completion conditions
+      // *** THIS IS THE KEY FIX: MOVE THE INNINGS COMPLETION LOGIC HERE ***
+      const isInningsComplete = 
+        newScore.wickets >= battingTeamPlayers || 
+        newScore.overs >= state.matchSetup.totalOvers || 
+        (state.currentInnings === 2 && newScore.runs > state.innings1.score.runs); 
+  
       if (isInningsComplete) {
         if (state.currentInnings === 1) {
           newGameState = 'innings2';
@@ -245,7 +244,7 @@ export const cricketReducer = (state, action) => {
         needsNewBowler: state.needsNewBowler,
         history: historySnapshot,
       };
-    }
+  }
     
     case 'SET_SECONDARY_INPUT':
       return {

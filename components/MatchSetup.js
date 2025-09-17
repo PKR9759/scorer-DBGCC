@@ -23,23 +23,29 @@ const MatchSetup = () => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     const newErrors = {};
+    
+    // Use `parseInt` with fallbacks here, when the form is submitted
+    const overs = parseInt(setup.totalOvers);
+    const playersA = parseInt(setup.playersTeamA);
+    const playersB = parseInt(setup.playersTeamB);
     
     // Validation
     if (!setup.teamA) newErrors.teamA = 'Team A name is required';
     if (!setup.teamB) newErrors.teamB = 'Team B name is required';
     if (!setup.battingFirst) newErrors.battingFirst = 'Please select batting team';
     
-    if (setup.totalOvers < 1 || setup.totalOvers > 50) {
+    if (isNaN(overs) || overs < 1 || overs > 50) {
       newErrors.totalOvers = 'Total overs must be between 1 and 50';
     }
     
-    if (setup.playersTeamA < 2 || setup.playersTeamA > 20) {
+    if (isNaN(playersA) || playersA < 2 || playersA > 20) {
       newErrors.playersTeamA = 'Team A players must be between 2 and 20';
     }
     
-    if (setup.playersTeamB < 2 || setup.playersTeamB > 20) {
+    if (isNaN(playersB) || playersB < 2 || playersB > 20) {
       newErrors.playersTeamB = 'Team B players must be between 2 and 20';
     }
     
@@ -48,7 +54,12 @@ const MatchSetup = () => {
     if (Object.keys(newErrors).length === 0) {
       dispatch({
         type: 'SETUP_MATCH',
-        payload: setup
+        payload: {
+          ...setup,
+          totalOvers: overs,
+          playersTeamA: playersA,
+          playersTeamB: playersB,
+        }
       });
     }
   };
@@ -65,13 +76,14 @@ const MatchSetup = () => {
             <p className="text-gray-600">Set up your match to begin</p>
           </div>
 
-          <div className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Team A
               </label>
               <input
                 type="text"
+                name="teamA"
                 value={setup.teamA}
                 onChange={(e) => {
                   setSetup({...setup, teamA: e.target.value});
@@ -91,8 +103,12 @@ const MatchSetup = () => {
               </label>
               <input
                 type="text"
+                name="teamB"
                 value={setup.teamB}
-                onChange={(e) => setSetup({...setup, teamB: e.target.value})}
+                onChange={(e) => {
+                  setSetup({...setup, teamB: e.target.value});
+                  clearError('teamB');
+                }}
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                   errors.teamB ? 'border-red-300' : 'border-gray-300'
                 }`}
@@ -106,8 +122,12 @@ const MatchSetup = () => {
                 Batting First
               </label>
               <select
+                name="battingFirst"
                 value={setup.battingFirst}
-                onChange={(e) => setSetup({...setup, battingFirst: e.target.value})}
+                onChange={(e) => {
+                  setSetup({...setup, battingFirst: e.target.value});
+                  clearError('battingFirst');
+                }}
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                   errors.battingFirst ? 'border-red-300' : 'border-gray-300'
                 }`}
@@ -126,11 +146,12 @@ const MatchSetup = () => {
               </label>
               <input
                 type="number"
+                name="totalOvers"
                 min="1"
                 max="50"
                 value={setup.totalOvers}
                 onChange={(e) => {
-                  setSetup({...setup, totalOvers: parseInt(e.target.value) || 20});
+                  setSetup({...setup, totalOvers: e.target.value});
                   clearError('totalOvers');
                 }}
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
@@ -156,11 +177,12 @@ const MatchSetup = () => {
                 </label>
                 <input
                   type="number"
+                  name="playersTeamA"
                   min="2"
                   max="20"
                   value={setup.playersTeamA}
                   onChange={(e) => {
-                    setSetup({...setup, playersTeamA: parseInt(e.target.value) || 11});
+                    setSetup({...setup, playersTeamA: e.target.value});
                     clearError('playersTeamA');
                   }}
                   className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
@@ -179,11 +201,12 @@ const MatchSetup = () => {
                 </label>
                 <input
                   type="number"
+                  name="playersTeamB"
                   min="2"
                   max="20"
                   value={setup.playersTeamB}
                   onChange={(e) => {
-                    setSetup({...setup, playersTeamB: parseInt(e.target.value) || 11});
+                    setSetup({...setup, playersTeamB: e.target.value});
                     clearError('playersTeamB');
                   }}
                   className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
@@ -238,6 +261,7 @@ const MatchSetup = () => {
               </label>
               <input
                 type="text"
+                name="venue"
                 value={setup.venue}
                 onChange={(e) => setSetup({...setup, venue: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
@@ -246,14 +270,13 @@ const MatchSetup = () => {
             </div>
 
             <button
-              onClick={handleSubmit}
-              disabled={!setup.teamA || !setup.teamB || !setup.battingFirst || setup.totalOvers < 1 || setup.playersTeamA < 2 || setup.playersTeamB < 2}
+              type="submit"
               className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center"
             >
               <Play className="w-5 h-5 mr-2" />
               Start Match
             </button>
-          </div>
+          </form>
         </div>
       </div>
     </div>
@@ -261,4 +284,3 @@ const MatchSetup = () => {
 };
 
 export default MatchSetup;
-
