@@ -212,13 +212,13 @@ export const cricketReducer = (state, action) => {
             const team2Players = state.matchSetup.playersTeamB;
             newWinner = {
               team: state.innings2.battingTeam,
-              margin: `${team2Players - 1 - newScore.wickets} wickets`,
+              margin: `${team2Players - newScore.wickets} wickets`,
               type: 'wickets'
             };
           } else if (team1Score > team2Score) {
             newWinner = {
               team: state.innings1.battingTeam,
-              margin: `${team1Score - team2Score} runs`,
+              margin: `${team1Score - team2Score } runs`,
               type: 'runs'
             };
           } else {
