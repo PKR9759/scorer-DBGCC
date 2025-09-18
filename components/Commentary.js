@@ -17,7 +17,7 @@ const Commentary = () => {
     <div className="bg-white rounded-2xl shadow-lg p-6 mb-4">
       <h3 className="text-lg font-semibold text-gray-800 mb-4">Ball-by-Ball Commentary</h3>
       <div className="max-h-48 overflow-y-auto space-y-2">
-        {ballCommentary.slice(0, 10).map((comment, index) => (
+        {ballCommentary.map((comment, index) => (
           <div
             key={index}
             className={`p-2 rounded-lg text-sm ${
