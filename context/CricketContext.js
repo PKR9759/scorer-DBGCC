@@ -59,8 +59,8 @@ export const cricketReducer = (state, action) => {
       const bowlingFirst = battingFirst === teamA ? teamB : teamA;
       
       // Generate player lists based on the count
-      const playersListA = ['divyang','vithani','prashant','nayen','kuldeep','subham','heet','abhishek','dhruv','ananad','manthan','jethva','kartik','het','dhaval','yash','chirag','parth','kiran'];
-      const playersListB = ['divyang','vithani','prashant','nayen','kuldeep','subham','heet','abhishek','dhruv','ananad','manthan','jethva','kartik','het','dhaval','yash','chirag','parth','kiran'];
+      const playersListA = ['divyang','vithani','prashant','nayen','kuldip','subham','heet','abhishek','dhruv','ananad','manthan','jethva','kartik','het','dhaval','yash','chirag','parth','kiran'];
+      const playersListB = ['divyang','vithani','prashant','nayen','kuldip','subham','heet','abhishek','dhruv','ananad','manthan','jethva','kartik','het','dhaval','yash','chirag','parth','kiran'];
 
       return {
         ...state,
@@ -118,8 +118,8 @@ export const cricketReducer = (state, action) => {
       // Handle runs and balls
       if (isExtra) {
         if (type === 'wide') {
-          newScore.runs += 1;
-          commentaryText = `Wide ball (+1 run)`;
+          // newScore.runs += 1;
+          commentaryText = `Wide ball `;
         } else if (type === 'noball') {
           newScore.runs += runs; 
           commentaryText = `No ball (+${runs} run${runs !== 1 ? 's' : ''})`;

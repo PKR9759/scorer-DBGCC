@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { RotateCcw, Trophy, Undo2, ListOrdered } from 'lucide-react';
+import { Trophy, Undo2, ListOrdered } from 'lucide-react';
 import { useCricket } from '../hooks/useCricket';
 import BatsmanBowlerSetup from './BatsmanBowlerSetup';
 import ScoreDisplay from './ScoreDisplay';
