@@ -15,7 +15,9 @@ export const initialState = {
     venue: '',
     totalOvers: 20,
     playersTeamA: 11,
-    playersTeamB: 11
+    playersTeamB: 11,
+    playersListA: [],
+    playersListB: []
   },
   gameState: 'setup', // 'setup', 'innings1', 'innings2', 'finished'
   currentInnings: 1,
@@ -46,7 +48,7 @@ export const initialState = {
   winner: null,
   needsNewBatsman: false,
   needsNewBowler: false,
-  history: [] // Stores a history of states for undo functionality
+  history: []
 };
 
 // Reducer
@@ -56,9 +58,13 @@ export const cricketReducer = (state, action) => {
       const { teamA, teamB, battingFirst, totalOvers, playersTeamA, playersTeamB, venue } = action.payload;
       const bowlingFirst = battingFirst === teamA ? teamB : teamA;
       
+      // Generate player lists based on the count
+      const playersListA = ['divyang','vithani','prashant','nayen','kuldeep','subham','heet','abhishek','dhruv','ananad','manthan','jethva','kartik','het','dhaval','yash','chirag','parth','kiran'];
+      const playersListB = ['divyang','vithani','prashant','nayen','kuldeep','subham','heet','abhishek','dhruv','ananad','manthan','jethva','kartik','het','dhaval','yash','chirag','parth','kiran'];
+
       return {
         ...state,
-        matchSetup: { teamA, teamB, venue, totalOvers, playersTeamA, playersTeamB },
+        matchSetup: { teamA, teamB, venue, totalOvers, playersTeamA, playersTeamB, playersListA, playersListB },
         innings1: {
           ...state.innings1,
           battingTeam: battingFirst,
@@ -71,10 +77,11 @@ export const cricketReducer = (state, action) => {
           target: 0
         },
         gameState: 'innings1',
-        history: [], // Ensure history is empty at the start of a new match
+        history: [],
       };
     }
     
+    // ... rest of the reducer cases remain unchanged
     case 'SET_BATSMAN_BOWLER': {
       const historySnapshot = [...state.history, state];
       const currentInningsKey = state.currentInnings === 1 ? 'innings1' : 'innings2';

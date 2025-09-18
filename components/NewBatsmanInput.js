@@ -5,19 +5,36 @@ import { useCricket } from '../hooks/useCricket';
 
 const NewBatsmanInput = () => {
   const { state, dispatch } = useCricket();
-  const [newBatsman, setNewBatsman] = useState('');
   
   const currentInnings = state.currentInnings === 1 ? state.innings1 : state.innings2;
-  const battingTeamPlayers = state.currentInnings === 1 ? state.matchSetup.playersTeamA : state.matchSetup.playersTeamB;
-  const isLastWicket = currentInnings.score.wickets >= (battingTeamPlayers - 1);
+  const battingTeamPlayersCount = state.currentInnings === 1 ? state.matchSetup.playersTeamA : state.matchSetup.playersTeamB;
+  const battingTeamPlayersList = state.currentInnings === 1 ? state.matchSetup.playersListA : state.matchSetup.playersListB;
+
+  const isLastWicket = currentInnings.score.wickets >= (battingTeamPlayersCount - 1);
+  
+  const [newBatsman, setNewBatsman] = useState('');
+  const [isCustomBatsman, setIsCustomBatsman] = useState(false);
+
+  const handleBatsmanChange = (e) => {
+    const value = e.target.value;
+    if (value === 'other') {
+      setIsCustomBatsman(true);
+      setNewBatsman('');
+    } else {
+      setIsCustomBatsman(false);
+      setNewBatsman(value);
+    }
+  };
 
   const handleSubmit = () => {
-    if (newBatsman.trim()) {
+    const finalBatsmanName = newBatsman.trim();
+    if (finalBatsmanName) {
       dispatch({
         type: 'SET_NEW_BATSMAN',
-        payload: newBatsman.trim()
+        payload: finalBatsmanName
       });
       setNewBatsman('');
+      setIsCustomBatsman(false);
     }
   };
 
@@ -38,15 +55,32 @@ const NewBatsmanInput = () => {
           <label className="block text-sm font-medium text-red-700 mb-1">
             New Batsman ({currentInnings.battingTeam})
           </label>
-          <input
-            type="text"
-            value={newBatsman}
-            onChange={(e) => setNewBatsman(e.target.value)}
+          <select
+            onChange={handleBatsmanChange}
+            value={isCustomBatsman ? 'other' : newBatsman}
             className="w-full px-3 py-2 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-            placeholder="Enter new batsman name"
-            autoFocus
-          />
+          >
+            <option value="" disabled>Select or enter a name</option>
+            {battingTeamPlayersList.map(player => (
+              <option key={player} value={player}>
+                {player}
+              </option>
+            ))}
+            <option value="other">Other (Enter a name)</option>
+          </select>
         </div>
+        {isCustomBatsman && (
+          <div>
+            <input
+              type="text"
+              value={newBatsman}
+              onChange={(e) => setNewBatsman(e.target.value)}
+              className="w-full px-3 py-2 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              placeholder="Enter new batsman name"
+              autoFocus
+            />
+          </div>
+        )}
         <button
           onClick={handleSubmit}
           disabled={!newBatsman.trim()}

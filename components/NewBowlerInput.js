@@ -5,17 +5,33 @@ import { useCricket } from '../hooks/useCricket';
 
 const NewBowlerInput = () => {
   const { state, dispatch } = useCricket();
-  const [newBowler, setNewBowler] = useState('');
   
   const currentInnings = state.currentInnings === 1 ? state.innings1 : state.innings2;
+  const bowlingTeamPlayersList = state.currentInnings === 1 ? state.matchSetup.playersListB : state.matchSetup.playersListA;
+
+  const [newBowler, setNewBowler] = useState('');
+  const [isCustomBowler, setIsCustomBowler] = useState(false);
+
+  const handleBowlerChange = (e) => {
+    const value = e.target.value;
+    if (value === 'other') {
+      setIsCustomBowler(true);
+      setNewBowler('');
+    } else {
+      setIsCustomBowler(false);
+      setNewBowler(value);
+    }
+  };
 
   const handleSubmit = () => {
-    if (newBowler.trim()) {
+    const finalBowlerName = newBowler.trim();
+    if (finalBowlerName) {
       dispatch({
         type: 'SET_NEW_BOWLER',
-        payload: newBowler.trim()
+        payload: finalBowlerName
       });
       setNewBowler('');
+      setIsCustomBowler(false);
     }
   };
 
@@ -29,15 +45,32 @@ const NewBowlerInput = () => {
           <label className="block text-sm font-medium text-blue-700 mb-1">
             New Bowler ({currentInnings.bowlingTeam})
           </label>
-          <input
-            type="text"
-            value={newBowler}
-            onChange={(e) => setNewBowler(e.target.value)}
+          <select
+            onChange={handleBowlerChange}
+            value={isCustomBowler ? 'other' : newBowler}
             className="w-full px-3 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Enter new bowler name"
-            autoFocus
-          />
+          >
+            <option value="" disabled>Select or enter a name</option>
+            {bowlingTeamPlayersList.map(player => (
+              <option key={player} value={player}>
+                {player}
+              </option>
+            ))}
+            <option value="other">Other (Enter a name)</option>
+          </select>
         </div>
+        {isCustomBowler && (
+          <div>
+            <input
+              type="text"
+              value={newBowler}
+              onChange={(e) => setNewBowler(e.target.value)}
+              className="w-full px-3 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter new bowler name"
+              autoFocus
+            />
+          </div>
+        )}
         <button
           onClick={handleSubmit}
           disabled={!newBowler.trim()}
@@ -51,4 +84,3 @@ const NewBowlerInput = () => {
 };
 
 export default NewBowlerInput;
-

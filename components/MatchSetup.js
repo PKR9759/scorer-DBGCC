@@ -240,7 +240,7 @@ const MatchSetup = () => {
                 <button
                   type="button"
                   onClick={() => setSetup({...setup, totalOvers: 10, playersTeamA: 6, playersTeamB: 6})}
-                  className="text-xs bg-purple-100 hover:bg-purple-200 text-purple-800 py-2 px-3 rounded-lg transition-colors"
+                  className="text-xs bg-purple-100 hover:bg-purple-200 text-purple-800 py-2 px-3 rounded-lgf transition-colors"
                 >
                   T10 (10 overs, 6 players)
                 </button>

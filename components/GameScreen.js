@@ -15,10 +15,6 @@ const GameScreen = () => {
   const { state, dispatch } = useCricket();
   const currentInnings = state.currentInnings === 1 ? state.innings1 : state.innings2;
 
-  const handleReset = () => {
-    dispatch({ type: 'RESET_MATCH' });
-  };
-
   const handleUndo = () => {
     dispatch({ type: 'UNDO' });
   };
@@ -55,12 +51,6 @@ const GameScreen = () => {
               >
                 <Undo2 className="w-5 h-5" />
               </button>
-              <button
-                onClick={handleReset}
-                className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors shadow-sm"
-              >
-                <RotateCcw className="w-5 h-5" />
-              </button>
             </div>
           </div>
           <ScoreDisplay />
@@ -92,12 +82,6 @@ const GameScreen = () => {
                 className="p-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
               >
                 <Undo2 className="w-5 h-5" />
-              </button>
-              <button
-                onClick={handleReset}
-                className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors shadow-sm"
-              >
-                <RotateCcw className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -146,14 +130,6 @@ const GameScreen = () => {
                 {state.winner.margin}
               </p>
             </div>
-
-            <button
-              onClick={handleReset}
-              className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center"
-            >
-              <RotateCcw className="w-5 h-5 mr-2" />
-              Start New Match
-            </button>
           </div>
         </div>
       </div>
@@ -181,12 +157,6 @@ const GameScreen = () => {
               className="p-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
             >
               <Undo2 className="w-5 h-5" />
-            </button>
-            <button
-              onClick={handleReset}
-              className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors shadow-sm"
-            >
-              <RotateCcw className="w-5 h-5" />
             </button>
           </div>
         </div>
