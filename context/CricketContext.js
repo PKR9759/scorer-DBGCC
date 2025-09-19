@@ -58,9 +58,8 @@ export const cricketReducer = (state, action) => {
       const { teamA, teamB, battingFirst, totalOvers, playersTeamA, playersTeamB, venue } = action.payload;
       const bowlingFirst = battingFirst === teamA ? teamB : teamA;
       
-      // Generate player lists based on the count
-      const playersListA = ['divyang','vithani','prashant','nayen','kuldip','subham','heet','abhishek','dhruv','ananad','manthan','jethva','kartik','het','dhaval','yash','chirag','parth','kiran'];
-      const playersListB = ['divyang','vithani','prashant','nayen','kuldip','subham','heet','abhishek','dhruv','ananad','manthan','jethva','kartik','het','dhaval','yash','chirag','parth','kiran'];
+      const playersListA = ['divyang', 'vithani', 'jethva', 'kuldip', 'kiran', 'nayen', 'abhishek', 'dhruv', 'anand', 'manthan', 'kartik', 'het', 'krish', 'mohit', 'vishvam', 'dhruvil', 'dhaval', 'yash', 'chirag', 'parth', 'heet', 'shubham', 'prashant'];
+      const playersListB = ['divyang', 'vithani', 'jethva', 'kuldip', 'kiran', 'nayen', 'abhishek', 'dhruv', 'anand', 'manthan', 'kartik', 'het', 'krish', 'mohit', 'vishvam', 'dhruvil', 'dhaval', 'yash', 'chirag', 'parth', 'heet', 'shubham', 'prashant'];
 
       return {
         ...state,
@@ -100,9 +99,9 @@ export const cricketReducer = (state, action) => {
       const historySnapshot = [...state.history, state];
       const currentInnings = state.currentInnings === 1 ? 'innings1' : 'innings2';
       const currentInningsData = state[currentInnings];
-      
+
       const { type, runs = 0, isWicket = false, isExtra = false } = action.payload;
-      
+
       let newScore = { ...currentInningsData.score };
       let newCurrentOver = [...currentInningsData.currentOver];
       let newCommentary = [...currentInningsData.ballCommentary];
@@ -110,52 +109,52 @@ export const cricketReducer = (state, action) => {
       let newPlayersOut = currentInningsData.playersOut;
       let newGameState = state.gameState;
       let newWinner = state.winner;
-      
+
       const battingTeamPlayers = state.currentInnings === 1 ? state.matchSetup.playersTeamA : state.matchSetup.playersTeamB;
-      
+
       let commentaryText = '';
-      
+
       // Handle runs and balls
       if (isExtra) {
         if (type === 'wide') {
           // newScore.runs += 1;
           commentaryText = `Wide ball `;
         } else if (type === 'noball') {
-          newScore.runs += runs; 
+          newScore.runs += runs;
           commentaryText = `No ball (+${runs} run${runs !== 1 ? 's' : ''})`;
         }
       } else {
         newScore.runs += runs;
         newScore.balls += 1;
-        
+
         if (isWicket) {
           commentaryText = `OUT! +${runs} run${runs !== 1 ? 's' : ''}`;
         } else {
           commentaryText = `${runs} run${runs !== 1 ? 's' : ''}`;
         }
       }
-  
+
       const ballNumber = `${newScore.overs}.${newScore.balls === 0 && !isExtra ? 6 : newScore.balls}`;
       let fullCommentaryText = `${ballNumber}: ${currentInningsData.currentBatsman} - ` + commentaryText;
-  
-      newCurrentOver.push({ 
-          type, 
-          runs, 
-          isWicket, 
-          isExtra, 
-          batsman: currentInningsData.currentBatsman,
-          bowler: currentInningsData.currentBowler, 
-          dismissalBowler: isWicket ? currentInningsData.currentBowler : null
+
+      newCurrentOver.push({
+        type,
+        runs,
+        isWicket,
+        isExtra,
+        batsman: currentInningsData.currentBatsman,
+        bowler: currentInningsData.currentBowler,
+        dismissalBowler: isWicket ? currentInningsData.currentBowler : null
       });
-      
+
       // Check for over completion (only for legal deliveries)
       if (!isExtra && newScore.balls === 6) {
         newScore.overs += 1;
         newScore.balls = 0;
-        
+
         const overRuns = newCurrentOver.reduce((sum, ball) => sum + ball.runs, 0);
         const overWickets = newCurrentOver.filter(ball => ball.isWicket).length;
-        
+
         newOverHistory.push({
           overNumber: newScore.overs,
           runs: overRuns,
@@ -163,30 +162,30 @@ export const cricketReducer = (state, action) => {
           bowler: currentInningsData.currentBowler,
           balls: newCurrentOver
         });
-        
+
         newCurrentOver = [];
         state.needsNewBowler = true;
       }
-      
+
       // Add wicket
       if (isWicket) {
         newScore.wickets += 1;
         newPlayersOut += 1;
-        
+
         if (newScore.wickets < battingTeamPlayers) {
           state.needsNewBatsman = true;
         }
       }
-      
+
       // Prepend commentary text
       newCommentary.unshift(fullCommentaryText);
-      
-      // *** THIS IS THE KEY FIX: MOVE THE INNINGS COMPLETION LOGIC HERE ***
-      const isInningsComplete = 
-        newScore.wickets >= battingTeamPlayers || 
-        newScore.overs >= state.matchSetup.totalOvers || 
-        (state.currentInnings === 2 && newScore.runs > state.innings1.score.runs); 
-  
+
+      // Check for innings completion
+      const isInningsComplete =
+        newScore.wickets >= battingTeamPlayers ||
+        newScore.overs >= state.matchSetup.totalOvers ||
+        (state.currentInnings === 2 && newScore.runs > state.innings1.score.runs);
+
       if (isInningsComplete) {
         if (state.currentInnings === 1) {
           newGameState = 'innings2';
@@ -208,13 +207,14 @@ export const cricketReducer = (state, action) => {
             currentInnings: 2,
             gameState: newGameState,
             secondaryInput: null,
-            history: historySnapshot
+            history: historySnapshot,
+            needsNewBowler: false, // <-- FIX: Reset the flag here
           };
         } else {
           newGameState = 'finished';
           const team1Score = state.innings1.score.runs;
           const team2Score = newScore.runs;
-          
+
           if (team2Score > team1Score) {
             const team2Players = state.matchSetup.playersTeamB;
             newWinner = {
@@ -225,15 +225,19 @@ export const cricketReducer = (state, action) => {
           } else if (team1Score > team2Score) {
             newWinner = {
               team: state.innings1.battingTeam,
-              margin: `${team1Score - team2Score } runs`,
+              margin: `${team1Score - team2Score} runs`,
               type: 'runs'
             };
           } else {
-            newWinner = { team: 'Tie', margin: 'Match Tied', type: 'tie' };
+            newWinner = {
+              team: 'Tie',
+              margin: 'Match Tied',
+              type: 'tie'
+            };
           }
         }
       }
-      
+
       return {
         ...state,
         [currentInnings]: {
@@ -251,7 +255,7 @@ export const cricketReducer = (state, action) => {
         needsNewBowler: state.needsNewBowler,
         history: historySnapshot,
       };
-  }
+    }
     
     case 'SET_SECONDARY_INPUT':
       return {
