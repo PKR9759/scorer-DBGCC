@@ -117,7 +117,6 @@ export const cricketReducer = (state, action) => {
       // Handle runs and balls
       if (isExtra) {
         if (type === 'wide') {
-          // newScore.runs += 1;
           commentaryText = `Wide ball `;
         } else if (type === 'noball') {
           newScore.runs += runs;
@@ -208,7 +207,8 @@ export const cricketReducer = (state, action) => {
             gameState: newGameState,
             secondaryInput: null,
             history: historySnapshot,
-            needsNewBowler: false, // <-- FIX: Reset the flag here
+            needsNewBowler: false,
+            needsNewBatsman: false,
           };
         } else {
           newGameState = 'finished';
@@ -251,8 +251,10 @@ export const cricketReducer = (state, action) => {
         gameState: newGameState,
         secondaryInput: null,
         winner: newWinner,
-        needsNewBatsman: state.needsNewBatsman,
-        needsNewBowler: state.needsNewBowler,
+        // --- FIX: Reset flags here for the final state
+        needsNewBatsman: isInningsComplete ? false : state.needsNewBatsman,
+        needsNewBowler: isInningsComplete ? false : state.needsNewBowler,
+        // ---
         history: historySnapshot,
       };
     }
