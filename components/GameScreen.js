@@ -1,7 +1,9 @@
+// File: components/GameScreen.js
+
 "use client";
 
 import React from 'react';
-import { Trophy, Undo2, ListOrdered } from 'lucide-react';
+import { Trophy, Undo2, ListOrdered, Settings } from 'lucide-react'; // Import Settings icon
 import { useCricket } from '../hooks/useCricket';
 import BatsmanBowlerSetup from './BatsmanBowlerSetup';
 import ScoreDisplay from './ScoreDisplay';
@@ -10,6 +12,7 @@ import BallInput from './BallInput';
 import Commentary from './Commentary';
 import NewBatsmanInput from './NewBatsmanInput';
 import NewBowlerInput from './NewBowlerInput';
+import SettingsForm from './SettingsForm'; // Import the new SettingsForm component
 
 const GameScreen = () => {
   const { state, dispatch } = useCricket();
@@ -22,6 +25,15 @@ const GameScreen = () => {
   const handleViewScorecard = () => {
     dispatch({ type: 'VIEW_SCORECARD' });
   };
+  
+  const handleViewSettings = () => {
+    dispatch({ type: 'VIEW_SETTINGS' });
+  };
+
+  // Conditionally render the settings form if the game state is 'settings'
+  if (state.gameState === 'settings') {
+    return <SettingsForm />;
+  }
 
   // Check if we need batsman/bowler setup
   if (!currentInnings.currentBatsman || !currentInnings.currentBowler) {
@@ -43,6 +55,12 @@ const GameScreen = () => {
                 className="p-2 bg-blue-300 hover:bg-blue-500 rounded-lg transition-colors"
               >
                 <ListOrdered className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleViewSettings} // Add Settings button
+                className="p-2 bg-gray-300 hover:bg-gray-400 rounded-lg transition-colors"
+              >
+                <Settings className="w-5 h-5" />
               </button>
               <button
                 onClick={handleUndo}
@@ -75,6 +93,12 @@ const GameScreen = () => {
                 className="p-2 bg-blue-300 hover:bg-blue-500 rounded-lg transition-colors"
               >
                 <ListOrdered className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleViewSettings} // Add Settings button
+                className="p-2 bg-gray-300 hover:bg-gray-400 rounded-lg transition-colors"
+              >
+                <Settings className="w-5 h-5" />
               </button>
               <button
                 onClick={handleUndo}
@@ -144,7 +168,12 @@ const GameScreen = () => {
             {state.currentInnings === 1 ? 'First' : 'Second'} Innings
           </h1>
           <div className="flex space-x-2">
-            {/* THIS IS THE MISSING BUTTON */}
+            <button
+              onClick={handleViewSettings} // Add Settings button
+              className="p-2 bg-gray-300 hover:bg-gray-400 rounded-lg transition-colors"
+            >
+              <Settings className="w-5 h-5" />
+            </button>
             <button
               onClick={handleViewScorecard}
               className="p-2 bg-blue-300 hover:bg-blue-500 rounded-lg transition-colors"

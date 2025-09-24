@@ -19,7 +19,7 @@ export const initialState = {
     playersListA: [],
     playersListB: []
   },
-  gameState: 'setup', // 'setup', 'innings1', 'innings2', 'finished'
+  gameState: 'setup', // 'setup', 'innings1', 'innings2', 'finished', 'settings'
   currentInnings: 1,
   innings1: {
     battingTeam: '',
@@ -320,6 +320,26 @@ export const cricketReducer = (state, action) => {
             ...state,
             gameState: state.currentInnings === 1 ? 'innings1' : 'innings2'
         };
+
+    case 'VIEW_SETTINGS':
+      return {
+        ...state,
+        gameState: 'settings'
+      };
+
+    case 'UPDATE_MATCH_SETUP': {
+      const { totalOvers, playersTeamA, playersTeamB } = action.payload;
+      return {
+        ...state,
+        matchSetup: {
+          ...state.matchSetup,
+          totalOvers: totalOvers,
+          playersTeamA: playersTeamA,
+          playersTeamB: playersTeamB,
+        },
+        gameState: state.currentInnings === 1 ? 'innings1' : 'innings2',
+      };
+    }
     
     default:
       return state;

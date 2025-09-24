@@ -6,8 +6,9 @@ import React from 'react';
 import { CricketProvider } from '../context/CricketContext';
 import MatchSetup from './MatchSetup';
 import GameScreen from './GameScreen';
-import Scorecard from './Scorecard'; // Import the new Scorecard component
+import Scorecard from './Scorecard';
 import { useCricket } from '../hooks/useCricket';
+import SettingsForm from './SettingsForm'; // Import the new SettingsForm component
 
 const CricketMain = () => {
     const { state } = useCricket();
@@ -18,6 +19,10 @@ const CricketMain = () => {
 
     if (state.gameState === 'scorecard') {
         return <Scorecard />;
+    }
+
+    if (state.gameState === 'settings') {
+        return <SettingsForm />;
     }
 
     return <GameScreen />;
